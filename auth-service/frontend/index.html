@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auth Service</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+    <h1>Authentication Service</h1>
+
+    <div id="auth-section">
+        <div class="login-card">
+            <h2>Sign In</h2>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Password">
+            <button id="login-btn">Login</button>
+            <p class="small">Don't have an account? <a href="/static/register.html">Register</a></p>
+        </div>
+    </div>
+
+    <div id="user-section" class="hidden">
+        <h2>User Info</h2>
+        <p id="user-info"></p>
+        <button id="verify-btn">Verify Token</button>
+        <button id="logout-btn">Logout</button>
+        <p id="verify-result"></p>
+</div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

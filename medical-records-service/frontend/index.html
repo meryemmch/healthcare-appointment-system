@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medical Records</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+    <nav style="display:flex;gap:12px;margin-bottom:12px;align-items:center">
+        <a href="http://localhost:8000/" target="_blank" style="text-decoration:none;color:var(--muted)">Auth</a>
+        <a href="http://localhost:8001/" target="_blank" style="text-decoration:none;color:var(--muted)">Patient</a>
+        <a href="http://localhost:8002/" target="_blank" style="text-decoration:none;color:var(--muted)">Doctor</a>
+        <a href="http://localhost:8003/" target="_blank" style="text-decoration:none;color:var(--muted)">Appointment</a>
+        <a href="/" style="text-decoration:none;color:var(--primary);font-weight:700">Records</a>
+        <a href="http://localhost:8006/" target="_blank" style="text-decoration:none;color:var(--muted)">Billing</a>
+    </nav>
+    <h1>Medical Records Service</h1>
+
+    <div id="record-section">
+        <h2>Create / Update Record</h2>
+        <input type="number" id="record-id" placeholder="Record ID (leave empty for new)">
+        <input type="number" id="patient-id" placeholder="Patient ID">
+        <input type="number" id="appointment-id" placeholder="Appointment ID (optional)">
+        <input type="text" id="diagnosis" placeholder="Diagnosis">
+        <input type="text" id="prescription" placeholder="Prescription">
+        <input type="text" id="lab-results" placeholder="Lab Results">
+        <input type="text" id="notes" placeholder="Notes">
+        <input type="date" id="record-date" placeholder="Record Date">
+        <input type="text" id="token" placeholder="Doctor/Admin Token">
+        <button id="save-btn">Save Record</button>
+    </div>
+
+    <div id="list-section">
+        <h2>Patient Records</h2>
+        <input type="number" id="filter-patient-id" placeholder="Filter by Patient ID">
+        <button id="filter-btn">Filter</button>
+        <button id="refresh-btn">Refresh List</button>
+        <div id="records-list"></div>
+    </div>
+
+    </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

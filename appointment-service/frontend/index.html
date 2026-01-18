@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Appointment Scheduler</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+    <nav style="display:flex;gap:12px;margin-bottom:12px;align-items:center">
+        <a href="http://localhost:8000/" target="_blank" style="text-decoration:none;color:var(--muted)">Auth</a>
+        <a href="http://localhost:8001/" target="_blank" style="text-decoration:none;color:var(--muted)">Patient</a>
+        <a href="http://localhost:8002/" target="_blank" style="text-decoration:none;color:var(--muted)">Doctor</a>
+        <a href="/" style="text-decoration:none;color:var(--primary);font-weight:700">Appointment</a>
+        <a href="http://localhost:8004/" target="_blank" style="text-decoration:none;color:var(--muted)">Records</a>
+        <a href="http://localhost:8006/" target="_blank" style="text-decoration:none;color:var(--muted)">Billing</a>
+    </nav>
+    <h1>Appointment Scheduler</h1>
+
+    <div id="app-section">
+        <h2>Book Appointment</h2>
+        <div style="margin-bottom:12px">
+
+            <input type="text" id="patient-name" placeholder="Your name">
+        </div>
+        <div style="margin-bottom:12px">
+            <h3>Doctors</h3>
+            <select id="filter-specialization">
+                <option value="all">All specializations</option>
+            </select>
+            <button id="load-doctors-btn">Load Doctors</button>
+            <div id="doctors-list"></div>
+        </div>
+        <input type="number" id="doctor-id" placeholder="Doctor ID">
+        <input type="date" id="appointment-date">
+        <select id="appointment-time">
+            <option value="09:00">09:00</option>
+            <option value="10:00">10:00</option>
+            <option value="11:00">11:00</option>
+            <option value="12:00">12:00</option>
+            <option value="13:00">13:00</option>
+            <option value="14:00">14:00</option>
+            <option value="15:00">15:00</option>
+            <option value="16:00">16:00</option>
+        </select>
+        <input type="text" id="reason" placeholder="Reason">
+        <button id="book-btn">Book</button>
+
+        <h2>Appointments</h2>
+        <div style="margin-bottom:8px">
+            <input type="text" id="lookup-username" placeholder="Username (optional)">
+            <button id="refresh-btn">Refresh</button>
+        </div>
+        <div id="appointments"></div>
+    </div>
+
+    </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Billing Service</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+    <nav style="display:flex;gap:12px;margin-bottom:12px;align-items:center">
+        <a href="http://localhost:8000/" target="_blank" style="text-decoration:none;color:var(--muted)">Auth</a>
+        <a href="http://localhost:8001/" target="_blank" style="text-decoration:none;color:var(--muted)">Patient</a>
+        <a href="http://localhost:8002/" target="_blank" style="text-decoration:none;color:var(--muted)">Doctor</a>
+        <a href="http://localhost:8003/" target="_blank" style="text-decoration:none;color:var(--muted)">Appointment</a>
+        <a href="http://localhost:8004/" target="_blank" style="text-decoration:none;color:var(--muted)">Records</a>
+        <a href="/" style="text-decoration:none;color:var(--primary);font-weight:700">Billing</a>
+    </nav>
+    <h1>Billing Service</h1>
+
+    <div id="invoice-section">
+        <h2>Create Invoice</h2>
+        <input type="number" id="patient-id" placeholder="Patient ID">
+        <input type="number" id="appointment-id" placeholder="Appointment ID (optional)">
+        <input type="number" id="amount" placeholder="Amount">
+        <input type="text" id="description" placeholder="Description">
+        <input type="date" id="invoice-date" placeholder="Invoice Date">
+        <input type="date" id="due-date" placeholder="Due Date">
+        <input type="text" id="token" placeholder="Admin/Doctor Token">
+        <button id="create-btn">Create Invoice</button>
+    </div>
+
+    <div id="list-section">
+        <h2>My Invoices</h2>
+        <input type="text" id="filter-status" placeholder="Status (pending/paid)">
+        <button id="filter-btn">Filter</button>
+        <button id="refresh-btn">Refresh List</button>
+        <div id="invoices-list"></div>
+    </div>
+
+    </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

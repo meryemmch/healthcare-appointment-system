@@ -1,0 +1,99 @@
+# Patient Service
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: patient-service
+  labels:
+    app: healthcare-system
+    service: patient
+spec:
+  replicas: 2
+  selector:
+    app: healthcare-system
+    service: patient
+  template:
+    metadata:
+      labels:
+        app: healthcare-system
+        service: patient
+    spec:
+      containers:
+      - name: patient-service
+        image: patient-service:latest
+        ports:
+        - containerPort: 8001
+          protocol: TCP
+        env:
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:8000"
+        - name: DB_HOST
+          value: "healthcare-db"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "healthcare"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: healthcare-db-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: healthcare-db-secret
+              key: password
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: patient-service
+  labels:
+    app: healthcare-system
+    service: patient
+spec:
+  ports:
+  - name: http
+    port: 8001
+    targetPort: 8001
+    protocol: TCP
+  selector:
+    app: healthcare-system
+    service: patient
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: patient-service
+  labels:
+    app: healthcare-system
+    service: patient
+spec:
+  to:
+    kind: Service
+    name: patient-service
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

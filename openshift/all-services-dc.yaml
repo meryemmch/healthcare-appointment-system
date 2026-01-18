@@ -1,0 +1,192 @@
+# Doctor Service
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: doctor-service
+spec:
+  replicas: 2
+  selector:
+    service: doctor
+  template:
+    metadata:
+      labels:
+        service: doctor
+    spec:
+      containers:
+      - name: doctor-service
+        image: doctor-service:latest
+        ports:
+        - containerPort: 8002
+        env:
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:8000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: doctor-service
+spec:
+  ports:
+  - port: 8002
+    targetPort: 8002
+  selector:
+    service: doctor
+---
+
+# Appointment Service
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: appointment-service
+spec:
+  replicas: 2
+  selector:
+    service: appointment
+  template:
+    metadata:
+      labels:
+        service: appointment
+    spec:
+      containers:
+      - name: appointment-service
+        image: appointment-service:latest
+        ports:
+        - containerPort: 8003
+        env:
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:8000"
+        - name: NOTIFICATION_SERVICE_URL
+          value: "http://notification-service:8005"
+        - name: DB_HOST
+          value: "healthcare-db"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "healthcare"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: healthcare-db-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: healthcare-db-secret
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appointment-service
+spec:
+  ports:
+  - port: 8003
+    targetPort: 8003
+  selector:
+    service: appointment
+---
+
+# Medical Records Service
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: medical-records-service
+spec:
+  replicas: 2
+  selector:
+    service: medical-records
+  template:
+    metadata:
+      labels:
+        service: medical-records
+    spec:
+      containers:
+      - name: medical-records-service
+        image: medical-records-service:latest
+        ports:
+        - containerPort: 8004
+        env:
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:8000"
+        - name: DB_HOST
+          value: "healthcare-db"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "healthcare"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: healthcare-db-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: healthcare-db-secret
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: medical-records-service
+spec:
+  ports:
+  - port: 8004
+    targetPort: 8004
+  selector:
+    service: medical-records
+---
+
+# Billing Service
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: billing-service
+spec:
+  replicas: 2
+  selector:
+    service: billing
+  template:
+    metadata:
+      labels:
+        service: billing
+    spec:
+      containers:
+      - name: billing-service
+        image: billing-service:latest
+        ports:
+        - containerPort: 8006
+        env:
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:8000"
+        - name: DB_HOST
+          value: "healthcare-db"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "healthcare"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: healthcare-db-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: healthcare-db-secret
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-service
+spec:
+  ports:
+  - port: 8006
+    targetPort: 8006
+  selector:
+    service: billing

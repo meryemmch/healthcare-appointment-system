@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Management</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+    <nav style="display:flex;gap:12px;margin-bottom:12px;align-items:center">
+        <a href="/" style="text-decoration:none;color:var(--primary);font-weight:700">Doctor</a>
+        <a href="http://localhost:8001/" style="text-decoration:none;color:var(--muted)">Patient</a>
+        <a href="http://localhost:8004/" style="text-decoration:none;color:var(--muted)">Records</a>
+        <a href="http://localhost:8006/" style="text-decoration:none;color:var(--muted)">Billing</a>
+    </nav>
+    <h1>Doctor Dashboard</h1>
+
+    <div id="list-section">
+        <h2>Appointments</h2>
+        <input type="text" id="filter-status" placeholder="Filter by status (scheduled/completed)">
+        <input type="date" id="filter-date" placeholder="Filter by date">
+        <button id="filter-btn">Filter</button>
+        <button id="refresh-btn">Refresh List</button>
+        <div id="appointments-list"></div>
+    </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

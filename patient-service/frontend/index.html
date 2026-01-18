@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Service</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>My Patients</h1>
+       
+
+        <div id="patients-controls" class="main-card" style="margin-bottom:12px;">
+            <div style="display:flex;gap:8px;align-items:center">
+                <input type="text" id="filter-patient-status" placeholder="Filter by status (optional)">
+                <input type="date" id="filter-patient-date" placeholder="Filter by date (optional)">
+                <button id="refresh-patients" onclick="location.reload()">Refresh</button>
+            </div>
+        </div>
+
+        <div id="patients-list" class="main-card">
+            
+        </div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

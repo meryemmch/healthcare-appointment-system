@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      name: doctor-service
+      labels:
+        app: healthcare-system
+        service: doctor
+    spec:
+      to:
+        kind: Service
+        name: doctor-service
+      port:
+        targetPort: http
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
+
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      name: appointment-service
+      labels:
+        app: healthcare-system
+        service: appointment
+    spec:
+      to:
+        kind: Service
+        name: appointment-service
+      port:
+        targetPort: http
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
+
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      name: medical-records-service
+      labels:
+        app: healthcare-system
+        service: medical-records
+    spec:
+      to:
+        kind: Service
+        name: medical-records-service
+      port:
+        targetPort: http
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
+
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      name: billing-service
+      labels:
+        app: healthcare-system
+        service: billing
+    spec:
+      to:
+        kind: Service
+        name: billing-service
+      port:
+        targetPort: http
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
