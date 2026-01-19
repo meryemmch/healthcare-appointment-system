@@ -1,2 +1,8 @@
 .env
 docker-compose.yml
+appointment-service/Dockerfile
+auth-service/Dockerfile
+billing-service/Dockerfile
+doctor-service/Dockerfile
+medical-records-service/Dockerfile
+patient-service/Dockerfile
