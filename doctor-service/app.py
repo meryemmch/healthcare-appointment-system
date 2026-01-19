@@ -186,9 +186,8 @@ def get_specializations(db: Session = Depends(get_db)):
     results = db.query(DoctorDB.specialization).distinct().all()
     return {"specializations": [r[0] for r in results]}
 
-# ------------------------------
-# Run server
-# ------------------------------
+"""
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
+"""

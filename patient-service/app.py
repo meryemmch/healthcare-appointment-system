@@ -195,9 +195,8 @@ def update_patient(patient_id: int, patient: Patient, user: dict = Depends(verif
     db.refresh(db_patient)
     return db_patient
 
-# ------------------------------
-# Run server
-# ------------------------------
+"""
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
+"""

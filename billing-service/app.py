@@ -208,9 +208,8 @@ def get_billing_summary(user: dict = Depends(verify_token), db: Session = Depend
         "total_amount": total[0] or 0.0
     }
 
-# ------------------------------
-# Run server
-# ------------------------------
+"""
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
+"""

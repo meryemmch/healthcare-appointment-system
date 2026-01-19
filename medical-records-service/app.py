@@ -200,9 +200,8 @@ def update_record(record_id: int, record: MedicalRecord, user: dict = Depends(ve
     db.refresh(db_record)
     return db_record
 
-# ------------------------------
-# Run server
-# ------------------------------
+"""
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8004)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
+"""
