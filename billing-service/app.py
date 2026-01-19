@@ -213,4 +213,4 @@ def get_billing_summary(user: dict = Depends(verify_token), db: Session = Depend
 # ------------------------------
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8006)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)))

@@ -1,51 +1,121 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Deploy the healthcare microservices to OpenShift using the YAML manifests in this directory.
-# Usage: ./deploy.sh [project-name]
-# Example: ./deploy.sh clinic-app
-
 PROJECT=${1:-clinic-app}
-ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-oc project ${PROJECT} >/dev/null 2>&1 || {
-  echo "Creating project ${PROJECT}..."
-  oc new-project ${PROJECT}
-}
+# 1️⃣ Log in and create project
+oc login <your-cluster-url>   # replace with your OpenShift cluster
+oc new-project $PROJECT || echo "Project $PROJECT already exists"
 
-echo "Applying secrets and configmaps..."
-oc apply -f "${ROOT_DIR}/secrets-configmap.yaml"
+# 2️⃣ Create secrets
+echo "Creating secrets..."
+oc create secret generic healthcare-db-secret \
+  --from-literal=username=healthcare_user \
+  --from-literal=password=supersecurepassword \
+  --dry-run=client -o yaml | oc apply -f -
 
-echo "Applying persistent volumes and Postgres..."
-oc apply -f "${ROOT_DIR}/persistent-volumes.yaml" || true
-oc apply -f "${ROOT_DIR}/postgres.yaml"
+oc create secret generic app-secrets \
+  --from-literal=jwt-secret="your-super-secret-jwt-key-change-this" \
+  --dry-run=client -o yaml | oc apply -f -
 
-echo "Applying auth and patient deploymentconfigs..."
-oc apply -f "${ROOT_DIR}/auth-service-dc.yaml"
-oc apply -f "${ROOT_DIR}/patient-service-dc.yaml"
+# 3️⃣ Deploy Postgres DB
+echo "Deploying Postgres..."
+oc new-app postgres:15 \
+  --name=healthcare-db \
+  -e POSTGRES_DB=healthcare \
+  -e POSTGRES_USER=healthcare_user \
+  -e POSTGRES_PASSWORD=supersecurepassword
 
-echo "Applying remaining services (doctor, appointment, records, billing)..."
-oc apply -f "${ROOT_DIR}/all-services-dc.yaml"
+# Optional: expose internally
+oc expose svc/healthcare-db --port=5432
 
-echo "Applying routes (exposes services)"
-oc apply -f "${ROOT_DIR}/routes.yaml"
+# 4️⃣ Deploy microservices from GitHub
+GIT_REPO="https://github.com/yosseer/DevOps-Incident-Board"
 
-# Wait for deploymentconfigs to roll out
-DC_LIST=(auth-service patient-service doctor-service appointment-service medical-records-service billing-service)
-for dc in "${DC_LIST[@]}"; do
-  echo "Waiting for deploymentconfig/${dc} to be ready..."
-  # Some resources may be Kubernetes Deployments (postgres), handle both
-  if oc get dc/${dc} >/dev/null 2>&1; then
-    oc rollout status dc/${dc} --watch=true || true
-  elif oc get deploy/${dc} >/dev/null 2>&1; then
-    oc rollout status deploy/${dc} --watch=true || true
-  else
-    echo "No deploymentconfig/deployment named ${dc} found yet"
-  fi
+echo "Deploying Auth Service..."
+oc new-app $GIT_REPO \
+  --name=auth-service \
+  --context-dir=auth-service \
+  --strategy=docker \
+  -e DB_HOST=healthcare-db \
+  -e DB_PORT=5432 \
+  -e DB_NAME=healthcare \
+  -e DB_USER=healthcare_user \
+  -e DB_PASSWORD=supersecurepassword \
+  -e SECRET_KEY="your-super-secret-jwt-key-change-this"
+
+echo "Deploying Patient Service..."
+oc new-app $GIT_REPO \
+  --name=patient-service \
+  --context-dir=patient-service \
+  --strategy=docker \
+  -e DB_HOST=healthcare-db \
+  -e DB_PORT=5432 \
+  -e DB_NAME=healthcare \
+  -e DB_USER=healthcare_user \
+  -e DB_PASSWORD=supersecurepassword \
+  -e AUTH_SERVICE_URL=http://auth-service:8000
+
+echo "Deploying Doctor Service..."
+oc new-app $GIT_REPO \
+  --name=doctor-service \
+  --context-dir=doctor-service \
+  --strategy=docker \
+  -e AUTH_SERVICE_URL=http://auth-service:8000
+
+echo "Deploying Appointment Service..."
+oc new-app $GIT_REPO \
+  --name=appointment-service \
+  --context-dir=appointment-service \
+  --strategy=docker \
+  -e DB_HOST=healthcare-db \
+  -e DB_PORT=5432 \
+  -e DB_NAME=healthcare \
+  -e DB_USER=healthcare_user \
+  -e DB_PASSWORD=supersecurepassword \
+  -e AUTH_SERVICE_URL=http://auth-service:8000 \
+  -e NOTIFICATION_SERVICE_URL=http://notification-service:8005
+
+echo "Deploying Medical Records Service..."
+oc new-app $GIT_REPO \
+  --name=medical-records-service \
+  --context-dir=medical-records-service \
+  --strategy=docker \
+  -e DB_HOST=healthcare-db \
+  -e DB_PORT=5432 \
+  -e DB_NAME=healthcare \
+  -e DB_USER=healthcare_user \
+  -e DB_PASSWORD=supersecurepassword \
+  -e AUTH_SERVICE_URL=http://auth-service:8000
+
+echo "Deploying Billing Service..."
+oc new-app $GIT_REPO \
+  --name=billing-service \
+  --context-dir=billing-service \
+  --strategy=docker \
+  -e DB_HOST=healthcare-db \
+  -e DB_PORT=5432 \
+  -e DB_NAME=healthcare \
+  -e DB_USER=healthcare_user \
+  -e DB_PASSWORD=supersecurepassword \
+  -e AUTH_SERVICE_URL=http://auth-service:8000
+
+# 5️⃣ Expose routes
+echo "Exposing routes..."
+oc expose svc/auth-service --port=8000 --name=auth-route
+oc expose svc/patient-service --port=8001 --name=patient-route
+oc expose svc/doctor-service --port=8002 --name=doctor-route
+oc expose svc/appointment-service --port=8003 --name=appointment-route
+oc expose svc/medical-records-service --port=8004 --name=records-route
+oc expose svc/billing-service --port=8006 --name=billing-route
+
+# 6️⃣ Wait for pods to be ready
+echo "Waiting for pods..."
+for svc in auth-service patient-service doctor-service appointment-service medical-records-service billing-service healthcare-db; do
+  echo "Waiting for $svc..."
+  oc rollout status deployment/$svc || true
 done
 
-# Print routes
+# 7️⃣ Print routes
 echo "Deployment complete. Routes:"
-oc get routes -o wide
-
-echo "You can now access the services via the listed routes (or use port-forwarding for local clusters)."
+oc get routes

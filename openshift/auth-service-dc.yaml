@@ -1,7 +1,5 @@
-
-# Auth Service
----
-apiVersion: v1
+# 01 - Auth DeploymentConfig
+apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
   name: auth-service
@@ -20,53 +18,41 @@ spec:
         service: auth
     spec:
       containers:
-      - name: auth-service
-        image: auth-service:latest
-        ports:
-        - containerPort: 8000
-          protocol: TCP
-        env:
-        - name: SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: jwt-secret
-        - name: DB_HOST
-          value: "healthcare-db"
-        - name: DB_PORT
-          value: "5432"
-        - name: DB_NAME
-          value: "healthcare"
-        - name: DB_USER
-          valueFrom:
-            secretKeyRef:
-              name: healthcare-db-secret
-              key: username
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: healthcare-db-secret
-              key: password
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 5
-        resources:
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
-          requests:
-            memory: "128Mi"
-            cpu: "250m"
+        - name: auth-service
+          image: auth-service:latest
+          ports:
+            - name: http
+              containerPort: 8000
+          # Use ConfigMap + Secret for environment variables
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+            - secretRef:
+                name: healthcare-db-secret
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+
 ---
+# 02 - Auth Service
 apiVersion: v1
 kind: Service
 metadata:
@@ -75,17 +61,19 @@ metadata:
     app: healthcare-system
     service: auth
 spec:
-  ports:
-  - name: http
-    port: 8000
-    targetPort: 8000
-    protocol: TCP
   selector:
     app: healthcare-system
     service: auth
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
   type: ClusterIP
+
 ---
-apiVersion: v1
+# 03 - Auth Route
+apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: auth-service
